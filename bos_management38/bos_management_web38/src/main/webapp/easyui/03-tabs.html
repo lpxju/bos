@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>选项卡</title>
+<link rel="stylesheet" type="text/css"
+	href="../js/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="../js/easyui/themes/icon.css">
+<script type="text/javascript" src="../js/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="../js/easyui/jquery.easyui.min.js"></script>
+</head>
+<body class="easyui-layout">
+	<div data-options="region:'north',border:false"
+		style="height: 60px; padding: 10px"></div>
+	<div data-options="region:'west',split:true,title:'菜单导航'"
+		style="width: 200px;">
+		<!-- 折叠面板  fit:true:自适应-->
+		<div class="easyui-accordion" style="width: 500px; height: 300px;" data-options="fit:true">
+			<div title="基本功能" data-options="iconCls:'icon-mini-add'"
+				style="overflow: auto; padding: 10px;">
+			 	<!-- 需求：通过添加一个按钮 动态打开选项卡 -->
+			 	<input type="button" id="mybutton" value="动态打开选项卡">
+			 	<script type="text/javascript">
+			 		//为按钮绑定单击事件 ，动态打开选项卡
+			 		$(function(){
+			 			//页面加载完成后为按钮绑定单击事件
+			 			$("#mybutton").click(function(){
+			 				//判断是否已经打开这个选项卡 
+			 				var flag = $('#mytabs').tabs('exists','快递员设置');
+			 				//alert(flag);
+			 				///如果已经打开则选中
+			 				if(flag){
+			 					$('#mytabs').tabs('select','快递员设置');
+			 				}
+			 				else
+		 					{
+			 					///如果未打开则新建选项卡
+				 				//看api如何打开选项卡
+				 				$('#mytabs').tabs('add',  //add:添加一个新的选项卡
+				 				        {
+				 				          title: '快递员设置',//选项卡标题
+				 				          selected: true, //选中
+				 				          closable:true//关闭按钮设置
+				 						}
+				 				);  
+		 					}
+			 				
+			 				
+			 			})
+			 		})
+			 	</script>
+			 	
+			 	
+			</div>
+			<div title="系统管理" data-options="iconCls:'icon-mini-add'"
+				style="padding: 10px;">
+				 
+			</div>
+		</div>
+	</div>
+	<div
+		data-options="region:'east',split:true,collapsed:true,title:'East'"
+		style="width: 100px; padding: 10px;">east region</div>
+	<div data-options="region:'south',border:false"
+		style="height: 50px; padding: 10px;">BOSv2.0综合物流管理平台 | Powered
+		by 传智播客 在线人数:1</div>
+	<div id="mytabs" data-options="region:'center'" class="easyui-tabs">
+		<!-- closable:true：关闭按钮 -->
+		<div title="消息中心" style="padding:10px" data-options="closable:true">
+		</div>
+		<div title="基础档案设置" style="padding:10px" data-options="closable:true">
+		</div>
+	</div>
+</body>
+</html>

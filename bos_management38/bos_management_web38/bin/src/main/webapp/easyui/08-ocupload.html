@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>文件上传-ocupload</title>
+<link rel="stylesheet" type="text/css"
+	href="../js/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="../js/easyui/themes/icon.css">
+<script type="text/javascript" src="../js/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="../js/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../js/jquery.ocupload-1.1.2.js"></script>
+<script type="text/javascript">
+	 
+</script>
+</head>
+<body>
+ <!-- 传统方式进行文件上传 -->
+<!--  <form target="abc" action="xxx" method="post" enctype="multipart/form-data">
+ 	文件上传<input type="file" name="myfile"><br/>
+ 	文件提交<input type="submit" value="文件上传">
+ </form>
+ <iframe name="abc" style="display:none" ></iframe> -->
+ 
+ <!-- ocupload插件 -->
+ <!-- 定一个普通按钮即可 -->
+ <input id="mybtn" type="button" value="导入"> 
+ <script type="text/javascript">
+ 	$(function(){
+ 		$("#mybtn").upload(
+ 			//ocupload中使用action来发送请求  name：文件名称  后台接收使用File areaFile
+ 			{name: 'areaFile',action: 'xxxx.action'}		
+ 		);
+ 	})
+ </script>
+</body>
+</html>

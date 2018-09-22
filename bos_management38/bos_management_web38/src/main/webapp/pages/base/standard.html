@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>取派标准</title>
+		<!-- 导入jquery核心类库 -->
+		<script type="text/javascript" src="../../js/jquery-1.8.3.js"></script>
+		<!-- 导入easyui类库 -->
+		<link rel="stylesheet" type="text/css" href="../../js/easyui/themes/default/easyui.css">
+		<link rel="stylesheet" type="text/css" href="../../js/easyui/themes/icon.css">
+		<link rel="stylesheet" type="text/css" href="../../js/easyui/ext/portal.css">
+		<link rel="stylesheet" type="text/css" href="../../css/default.css">
+		<script type="text/javascript" src="../../js/easyui/jquery.easyui.min.js"></script>
+		<script type="text/javascript" src="../../js/easyui/ext/jquery.portal.js"></script>
+		<script type="text/javascript" src="../../js/easyui/ext/jquery.cookie.js"></script>
+		<script src="../../js/easyui/locale/easyui-lang-zh_CN.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			$(function(){
+				// 先将body隐藏，再显示，不会出现页面刷新效果
+				$("body").css({visibility:"visible"});
+				
+				// 收派标准信息表格
+				$('#grid').datagrid( {
+					fit : true,//自适应
+					border : false,//没有边框
+					rownumbers : true,//行编号
+					striped : true,//True有条纹的行
+					pageList: [1,2,3],//分页下拉列表值
+					pageSize:3,
+					pagination : true,//启用分页
+					toolbar : toolbar,//工具栏
+					url : "../../standardAction_pageQuery.action",//请求数据属性
+					idField : 'id',//主键标识 
+					columns : columns //列名
+				});
+			});	
+			
+			//工具栏
+			var toolbar = [ {
+				id : 'button-add',
+				text : '增加',
+				iconCls : 'icon-add',
+				handler : function(){
+					//alert('增加');
+					//window.location.href="../../standard_save";
+					//打开添加收派标准窗口
+					$('#standardWindow').window('open');
+				}
+			}, {
+				id : 'button-edit',
+				text : '修改',
+				iconCls : 'icon-edit',
+				handler : function(){
+					//easyui datagrid获取行的方法
+					var rows = $("#grid").datagrid("getSelections");//返回的是数组
+					if(rows.length == 1){
+						$('#standardWindow').window('open');
+						//getSelections返回所有选定的行,当没有记录被选中,我将返回空数组
+						//console.log(rows);
+						//alert(JSON.stringify(rows));
+						///easyui form控件 中提供 load方法 将 json对象数据填充到form表单中
+						$('#standardForm').form('load',rows[0]);  
+					}
+					else
+					{
+						$.messager.alert("提示信息","请选择一条收派标准进行修改","warning");
+					}
+					
+					
+				}
+			},{
+				id : 'button-delete',
+				text : '作废',
+				iconCls : 'icon-cancel',
+				handler : function(){
+					alert('作废');
+				}
+			},{
+				id : 'button-restore',
+				text : '还原',
+				iconCls : 'icon-save',
+				handler : function(){
+					alert('还原');
+				}
+			}];
+			
+			// 定义列
+			var columns = [ [ {
+				field : 'id',//要跟后台返回的数据字段名称要一致
+				checkbox : true
+			},{
+				field : 'name',
+				title : '标准名称',
+				width : 120,
+				align : 'center'
+			}, {
+				field : 'minWeight',
+				title : '最小重量',
+				width : 120,
+				align : 'center'
+			}, {
+				field : 'maxWeight',
+				title : '最大重量',
+				width : 120,
+				align : 'center'
+			}, {
+				field : 'minLength',
+				title : '最小长度',
+				width : 120,
+				align : 'center'
+			}, {
+				field : 'maxLength',
+				title : '最大长度',
+				width : 120,
+				align : 'center'
+			}, {
+				field : 'operator',
+				title : '操作人',
+				width : 120,
+				align : 'center'
+			}, {
+				field : 'operatingTime',
+				title : '操作时间',
+				width : 120,
+				align : 'center'
+			}, {
+				field : 'company',
+				title : '操作单位',
+				width : 120,
+				align : 'center'
+			} ] ];
+		</script>
+	</head>
+
+	<body class="easyui-layout" style="visibility:hidden;">
+		<div region="center" border="false">
+			<table id="grid"></table>
+		</div>
+		
+		<div class="easyui-window" title="对收派标准进行添加或者修改" id="standardWindow" collapsible="false" minimizable="false" maximizable="false" modal="true" closed="true" style="width:600px;top:50px;left:200px">
+			<div region="north" style="height:31px;overflow:hidden;" split="false" border="false">
+				<div class="datagrid-toolbar">
+					<a id="save" icon="icon-save" href="#" class="easyui-linkbutton" plain="true">保存</a>
+					<script type="text/javascript">
+						$(function(){
+							//页面加载完成后为按钮绑定单击事件
+							$("#save").click(function(){
+								if($("#standardForm").form("validate")){
+									///easyui 提供form验证方法 
+									$("#standardForm").submit();
+								}
+							})
+							
+						})
+					</script>
+				</div>
+			</div>
+
+			<div region="center" style="overflow:auto;padding:5px;" border="false">
+				
+				<form id="standardForm" action="../../standardAction_save.action" method="post">
+					<table class="table-edit" width="80%" align="center">
+						<tr class="title">
+							<td colspan="2">收派标准信息
+								<!--提供隐藏域 装载id -->
+								<input type="hidden" name="id" />
+							</td>
+						</tr>
+						<tr>
+							<td>收派标准名称</td>
+							<td>
+								<input type="text" name="name" 
+									class="easyui-validatebox" data-options="required:true" />
+							</td>
+						</tr>
+						<tr>
+							<td>最小重量</td>
+							<td>
+								<input type="text" name="minWeight" 
+										class="easyui-numberbox" required="true" />
+							</td>
+						</tr>
+						<tr>
+							<td>最大重量</td>
+							<td>
+								<input type="text" name="maxWeight" class="easyui-numberbox" required="true" />
+							</td>
+						</tr>
+						<tr>
+							<td>最小长度</td>
+							<td>
+								<input type="text" name="minLength" class="easyui-numberbox" required="true" />
+							</td>
+						</tr>
+						<tr>
+							<td>最大长度</td>
+							<td>
+								<input type="text" name="maxLength" class="easyui-numberbox" required="true" />
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+		</div>
+	</body>
+
+</html>

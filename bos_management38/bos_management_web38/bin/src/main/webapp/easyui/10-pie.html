@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>基础饼图</title>
+<!-- 引入highcharts 相关js -->
+<script src="../js/jquery-1.8.3.js"></script>
+<script src="../js/highcharts/highcharts.js"></script>
+<script src="../js/highcharts/modules/exporting.js"></script></head>
+<body>
+<!-- 容器存放图形图表 -->
+<div id="container" style="min-width:400px;height:400px"></div>
+
+	<script>
+	$(function () {
+    $('#container').highcharts({
+        title: {
+            text: '2014 某网站各浏览器浏览量占比'
+        },
+        series: [{
+            type: 'pie', //类型 饼图
+            name: '浏览器访问量占比',
+            data: [
+                ['Firefox',   45.0],
+                ['IE',       26.8],
+                ['Safari',    8.5],
+                ['Opera',     6.2],
+                ['其他',   0.7]
+            ]
+        }]
+    });
+});
+</script>
+</body>
+</html>

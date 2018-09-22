@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <!-- Maven project工程知道父工程是谁 顶级父工程不知道Maven project工程是谁（project） -->
+  <parent>
+    <groupId>com.itheima.maven</groupId>
+    <artifactId>common_parent38</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>bos_management38</artifactId>
+  <packaging>pom</packaging>
+  <description>父工程（聚合工程）</description>
+  <modules>
+  	<module>bos_management_domain38</module>
+  	<module>bos_management_dao38</module>
+  	<module>bos_management_service38</module>
+  	<module>bos_management_web38</module>
+  	<module>bos_management_utils38</module>
+  </modules>
+  
+  <build>
+		<pluginManagement>
+			<!-- jdk插件 -->
+			<plugins>
+				<!-- 引入tomcat插件 -->
+				<plugin>
+					<groupId>org.apache.tomcat.maven</groupId>
+					<artifactId>tomcat7-maven-plugin</artifactId>
+					<version>2.2</version>
+					<configuration>
+						<uriEncoding>UTF-8</uriEncoding>
+						<path>/bos</path>
+						<port>8888</port>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

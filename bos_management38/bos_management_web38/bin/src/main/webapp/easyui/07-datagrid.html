@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>数据表格</title>
+<link rel="stylesheet" type="text/css"
+	href="../js/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="../js/easyui/themes/icon.css">
+<script type="text/javascript" src="../js/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="../js/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript">
+	 
+</script>
+</head>
+<body>
+
+	将静态HTML渲染为datagrid样式  field:返回的数据字段 必须要跟这个field字段名一致
+	<!-- <table class="easyui-datagrid" style="width: 305px">
+		<thead>
+			<tr>
+				<th data-options="field:'id',width:100">员工编号</th>
+				<th data-options="field:'name',width:100">员工姓名</th>
+				<th data-options="field:'sal',width:100">员工薪资</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>10000</td>
+				<td>杨航</td>
+				<td>15000</td>
+			</tr>
+			<tr>
+				<td>10001</td>
+				<td>余奇峰</td>
+				<td>20000</td>
+			</tr>
+		</tbody>
+	</table> -->
+
+	发送ajax请求获取动态json数据构造datagrid  url:发送ajax请求数据
+	<!-- <table class="easyui-datagrid" style="width: 305px;"
+		data-options="url:'../data/datagrid_data.json'">
+		<thead>
+			<tr>
+				<th data-options="field:'id',width:100">员工编号</th>
+				<th data-options="field:'name',width:100">员工姓名</th>
+				<th data-options="field:'sal',width:100">员工薪资</th>
+			</tr>
+		</thead>
+	</table> -->
+
+
+	使用easyUI提供的API动态创建datagrid（推荐使用方式）
+	<!-- 定一个容器 用于存放数据表格 -->
+	<table id="dg" style="width: 605px"></table>
+	<script type="text/javascript">
+		$(function(){
+			$('#dg').datagrid(
+								{ ///json数据格式
+				
+									url:'../data/datagrid_data.json', //请求的json数据
+									columns:[[ //columns 标题行 （包含多列）
+										{field:'id',title:'员工编号',width:100}, 
+										{field:'name',title:'员工姓名',width:100}, 
+										{field:'sal',title:'员工薪资',width:100,align:'right'} 
+									]],
+									//工具栏
+									toolbar: [
+											      {  		
+												  iconCls: 'icon-add',  //按钮样式
+												  text:'增加',//按钮标题
+												  handler: function() //回调函数
+												  	  {
+													    alert('edit')
+													  }  	
+												  },
+												  {  		
+												  iconCls: 'icon-edit',  //按钮样式
+												  text:'修改',//按钮标题
+												  handler: function() //回调函数
+												  	  {
+													    alert('edit')
+													  }  	
+												  },
+												  {  		
+												  iconCls: 'icon-cancel',  //按钮样式
+												  text:'作废',//按钮标题
+												  handler: function() //回调函数
+												  	  {
+													    alert('edit')
+													  }  	
+												  },
+												  {  		
+												  iconCls: 'icon-save',  //按钮样式
+												  text:'还原',//按钮标题
+												  handler: function() //回调函数
+												  	  {
+													    alert('edit')
+													  }  	
+												  }
+										  	  ],
+										pagination:true, // 启用分页
+										pageSize:3,//当设置分页属性,初始化页面大小 pageSize必须要在pageList值列表中
+										pageList:[1,2,3,4,5]//pageList下拉列表值设置
+								}
+							); 
+		})
+	</script>
+
+
+	
+	
+	
+</body>
+</html>

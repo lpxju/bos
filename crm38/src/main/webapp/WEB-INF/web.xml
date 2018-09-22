@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  <display-name>crm38</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  
+  
+   <context-param>
+  	<param-name>contextConfigLocation</param-name>
+  	<param-value>classpath:applicationContext.xml</param-value>
+  </context-param>
+  <!-- 通过spring核心监听器加载applicationContext.xml -->
+  <listener>
+  	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  
+  <!-- 配置servlet拦截ws请求   http://ip:port/项目名称/cxf/服务名称?wsdl-->
+  <servlet>
+  	<servlet-name>cxf</servlet-name>
+  	<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+  	<!-- 配置初始化的文件  将cxf服务配置以及spring配置放在一个文件 -->
+  	<!-- <init-param>
+  		<param-name>config-location</param-name>
+  		<param-value>classpath:applicationContext.xml</param-value>
+  	</init-param> -->
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>cxf</servlet-name>
+  	<url-pattern>/ws/*</url-pattern>
+  </servlet-mapping>
+  
+</web-app>

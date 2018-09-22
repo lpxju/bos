@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa" 
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:soap="http://cxf.apache.org/bindings/soap"
+	xsi:schemaLocation="
+						http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+						http://www.springframework.org/schema/data/jpa 
+						http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+						http://cxf.apache.org/bindings/soap 
+						http://cxf.apache.org/schemas/configuration/soap.xsd
+						http://cxf.apache.org/jaxws 
+						http://cxf.apache.org/schemas/jaxws.xsd">
+	<bean id="config" class="com.ht.util.Config">
+        <property name="templateFolder">
+            <value>/WEB-INF/templates</value>
+        </property>
+    </bean>
+
+
+	<!-- 注册自定义任务类 -->
+	<bean id="myjob" class="cn.itheima.bos.jobs.WorkBillJobs" ></bean>
+	<!-- 注册job Detail容器 -->
+	<bean id="myJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+	    <!-- jobDetail任务的类对象  调用哪个方法 -->
+	    <property name="targetObject" ref="myjob"></property>
+	    <property name="targetMethod" value="sendMail"></property>
+	</bean>
+	<!-- 注册触发器 触发容器任务 -->
+	<bean id="myTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+	    <!-- 配置触发哪个任务 -->
+	    <property name="jobDetail" ref="myJobDetail"></property>
+	    <!-- 告知什么时间运行任务 -->
+	    <!-- cronExpression:配置任务运行时间属性 -->
+	    <property name="cronExpression">
+	        <!-- 每隔5秒运行一次 -->
+	        <value>0/30 * * * * ? 2020</value>
+	    </property>
+	</bean>
+	<!-- 将触发器放入容器 -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+	    <!-- 配置触发器 可以配置多个 -->
+	    <property name="triggers">
+	        <list>
+	            <ref bean="myTrigger"/>
+	        </list>
+	    </property>
+	</bean>
+
+	<!-- 基于spring创建代理对象   强制使用cglib方式-->
+	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator">
+		<!-- 默认是jdk方式创建代理对象 -->
+		<property name="proxyTargetClass" value="true"></property>
+	</bean>
+	<!-- 切面类=切入点+通知 -->
+	<bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor"></bean>
+	
+	<!-- 配置spring整合shiro配置   注意id一定要跟webxml一致 -->
+	<bean id="shiro" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<!-- 配置安全管理器 -->
+		<property name="securityManager" ref="securityManager"></property>
+	    <!-- 登录页面 -->
+		<property name="loginUrl"  value="/login.html"></property>	
+		<!-- 登录成功后的页面 -->
+		<property name="successUrl"  value="/index.html"></property>	
+		<!-- 没有权限页面 -->
+		<property name="unauthorizedUrl"  value="/unauthorizedUrl.html"></property>		
+		
+		<!-- 配置拦截规则    每一行就是一个拦截规则
+			/** 拦截所有的请求 = authc shiro框架中自带的过滤器 过滤别名  如果需要访问页面需要认证
+			如果没有认证 则跳转登录页面 shiro框架默认login.jsp
+			
+			anon:匿名过滤器  不需要权限就可以访问
+			perms：授权过滤器 （进行权限控制）当访问/pages/base/area.html 需要用户有area权限 （url拦截）
+			
+			要求认证才能访问页面 -->
+		<property name="filterChainDefinitions">
+			<value>
+			/css/** = anon 
+			/images/** = anon
+		 	/js/** = anon
+		 	/validatecode.jsp* = anon
+		 	/easyui/shiro.jsp = anon
+		 	/userAction_login.action = anon
+		 	<!-- /pages/base/area.html = perms["area"] -->
+			/** = authc
+			</value>
+		</property>
+	</bean>
+	<!-- 注册自定义realm -->
+	<bean id="bosRealm"  class="cn.itheima.bos.web.realm.BosRealm"/>
+	
+	<!-- 注册ehcache -->
+	<bean id="ehCacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+		<!-- 配置缓存最大数量  最大缓存有效时间等等一系列配置 -->
+		<property name="cacheManagerConfigFile" value="classpath:ehcache.xml"></property>
+	</bean>
+	<!-- 注册安全管理器 -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager"> 
+		<!-- 配置注入自定义realm -->
+		<property name="realm" ref="bosRealm"></property>
+		
+		<!-- 配置使用ehcache缓存管理器 -->
+		<property name="cacheManager" ref="ehCacheManager"></property>
+		<!-- <property name="realms">
+			<list>
+				<ref bean="bosRealm"/>
+			</list>
+		</property> -->
+	</bean>
+	
+	<!-- 连接池 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="oracle.jdbc.driver.OracleDriver" />
+		<property name="jdbcUrl" value="jdbc:oracle:thin:@192.168.27.200:1521:ORCL" />
+		<property name="user" value="heima_bos_03" />
+		<property name="password" value="heima_bos03" />
+	</bean> 
+	
+	<!-- spring整合JPA -->
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- 指定扫描的包，存放实体类 -->
+		<property name="packagesToScan" value="cn.itheima.bos.domain" />
+		<!-- 指定持久层提供者为Hibernate -->
+		<property name="persistenceProvider">
+			<bean class="org.hibernate.ejb.HibernatePersistence" />
+		</property>
+		<!-- jpa供应商适配器 （自动建表 数据库 方言 是否显示sql语句） -->
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<!-- 自动建表 -->
+				<property name="generateDdl" value="true" />
+				<property name="database" value="ORACLE" />
+				<property name="databasePlatform" value="org.hibernate.dialect.Oracle10gDialect" />
+				<property name="showSql" value="true" />
+			</bean>
+		</property>
+		<!-- jpa方言配置 可以不加 （前提必须有jpaVendorAdapter配置） 自动识别 -->
+		<property name="jpaDialect">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+		</property>
+	</bean>
+	
+	<!-- 事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+	
+	<!-- 组件扫描 @Server @Controller @Repository -->
+	<context:component-scan base-package="cn.itheima.bos.service,cn.itheima.bos.web"/>
+	
+	<!-- 事务注解支持  proxy-target-class="false"jdk代理镀锡  true:cglib代理对象-->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+	<!-- Spring 初始化容器时将会扫描 base-package 指定的包目录及其子目录，
+	为继承 Repository 或其子接口的接口创建代理对象，
+	并将代理对象注册为 Spring Bean，放入spring容器中，业务层便可以通过注解注入的方式来直接使用该对象。 -->
+	<jpa:repositories base-package="cn.itheima.bos.dao" />
+	<!-- 配置客户端 -->
+	<jaxws:client id="crmClient" address="http://localhost:8889/crm/ws/crmService?wsdl" serviceClass="cn.itheima.crm.service.CustomerServiceImpl"></jaxws:client>
+
+	<!-- 在线下单服务端 -->
+	<jaxws:server address="/orderService">
+		<jaxws:serviceBean>
+			<ref bean="orderServiceImpl"/>
+		</jaxws:serviceBean>
+	</jaxws:server>
+</beans>

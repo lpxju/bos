@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa" 
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:soap="http://cxf.apache.org/bindings/soap"
+	xmlns:amq="http://activemq.apache.org/schema/core"
+	xmlns:jms="http://www.springframework.org/schema/jms"
+	xsi:schemaLocation="
+						http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+						http://www.springframework.org/schema/data/jpa 
+						http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+						http://cxf.apache.org/bindings/soap 
+						http://cxf.apache.org/schemas/configuration/soap.xsd
+						http://cxf.apache.org/jaxws 
+						http://cxf.apache.org/schemas/jaxws.xsd
+						http://www.springframework.org/schema/jms
+				        http://www.springframework.org/schema/jms/spring-jms.xsd
+						http://activemq.apache.org/schema/core
+				        http://activemq.apache.org/schema/core/activemq-core-5.8.0.xsd">
+
+	 <!-- 扫描包 -->
+	<context:component-scan base-package="cn.itheima" />
+	
+    <!-- 注册连接工厂 -->
+    <bean id="amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    	<property name="brokerURL" value="tcp://192.168.27.44:61616"></property>
+    </bean>
+    <!-- 配置ActiveMQ服务器连接conneciotnFactory -->
+    <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <!-- 将ActiveMQ提供的ConnectionFactory注入到Spring管理的connectionFactory中 -->  
+        <property name="targetConnectionFactory" ref="amqConnectionFactory"></property>
+        <!-- 同上，同理 -->
+        <!-- <constructor-arg ref="amqConnectionFactory" /> -->
+        <!-- 设置缓存大小 -->
+        <property name="sessionCacheSize" value="100" />
+    </bean>
+   
+    <!-- 以上都是消费者配置 -->
+    <!-- 消息消费者 start-->
+    <!-- 定义Queue监听器 监听消息队列消费消息 
+    destination-type：配置消息队列类型 queue：点对点模式  topic：发布订阅模式
+    -->
+    <jms:listener-container destination-type="queue" container-type="default" connection-factory="connectionFactory" acknowledge="auto">
+        <!-- 告诉监听哪个消息队列 
+        destination:消息队列名称
+        ref：监听者配置
+        -->
+        <jms:listener destination="sms_message" ref="smsConsumer"/>
+        
+        <jms:listener destination="mail_message" ref="mailWorkBill"/>
+    </jms:listener-container>
+	  
+</beans>

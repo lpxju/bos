@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>页面布局</title>
+	<link rel="stylesheet" type="text/css" href="../js/easyui/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../js/easyui/themes/icon.css">
+	<script type="text/javascript" src="../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="../js/easyui/jquery.easyui.min.js"></script>
+</head>
+<!-- easyui-layout：页面布局样式设置  easyui开头样式。。。
+north：北  west:西  south:南  center：中心 east:东
+ -->
+<body class="easyui-layout">
+	<div data-options="region:'north',border:false" style="height:60px;padding:10px">
+	</div>
+	<div data-options="region:'west',split:true,title:'菜单导航'" style="width:200px;padding:10px;">
+	</div>
+	<div data-options="region:'east',split:true,collapsed:true,title:'East'" style="width:100px;padding:10px;">east region</div>
+	<div data-options="region:'south',border:false" style="height:50px;padding:10px;">
+	BOSv2.0综合物流管理平台 | Powered by 传智播客 在线人数:1
+	</div>
+	<div data-options="region:'center',title:'消息中心'"></div>
+</body>
+</html>

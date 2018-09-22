@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>树形菜单</title>
+<link rel="stylesheet" type="text/css"
+	href="../js/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="../js/easyui/themes/icon.css">
+<script type="text/javascript" src="../js/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="../js/easyui/jquery.easyui.min.js"></script>
+
+<!-- 第一步：引入ztree css 样式  js-->
+<link rel="stylesheet" href="../js/ztree/zTreeStyle.css" type="text/css">
+<script type="text/javascript" src="../js/ztree/jquery.ztree.all-3.5.js"></script>
+<SCRIPT type="text/javascript" >
+//同时定义多个变量 使用逗号分隔
+
+	/////////////////////////////////////标准json构造ztree
+	/*var setting = {
+		view: {
+			selectedMulti: false
+		}
+	};
+	 var zTreeNodes = [   ///name:节点名称 open:true：默认打开   children:子节点
+		{"name":"网站导航", children: 
+			[
+				{ "name":"google", "url":"http://g.cn", "target":"_blank",
+					children: 
+						[
+							{ "name":"google", "url":"http://g.cn", "target":"_blank"},
+							{ "name":"baidu", "url":"http://baidu.com", "target":"_blank"},
+							{ "name":"sina", "url":"http://www.sina.com.cn", "target":"_blank"}
+						]
+					
+				},
+				{ "name":"baidu", "url":"http://baidu.com", "target":"_blank"},
+				{ "name":"sina", "url":"http://www.sina.com.cn", "target":"_blank"}
+			]
+		}
+	]; */
+	
+	/////////////////////////////////////简单json构造ztree
+	var setting = {
+		//默认使用属性默认值
+		//如果要使用简单json构造ztree 必须要启用简单数据模式
+		data : {
+			simpleData : {
+				enable : true
+			}
+		},
+		//当ztree树形菜单加载完成后 为节点绑定单击事件
+		callback: {
+			onClick: function(event, treeId, treeNode){//匿名函数
+				// alert(treeNode.tId + ", " + treeNode.name);
+			if(treeNode.page != 'undefined' ){
+				//判断是否已经打开这个选项卡 
+ 				var flag = $('#mytabs').tabs('exists',treeNode.name);
+ 				//alert(flag);
+ 				///如果已经打开则选中
+ 				if(flag){
+ 					$('#mytabs').tabs('select',treeNode.name);
+ 				}
+ 				else
+				{
+					///如果未打开则新建选项卡
+ 				//看api如何打开选项卡
+ 				$('#mytabs').tabs('add',  //add:添加一个新的选项卡
+ 				        {
+ 				          title: treeNode.name,//选项卡标题
+ 				          selected: true, //选中
+ 				          closable:true,//关闭按钮设置
+ 				          content:'<iframe width="100%" height="100%" src="../'+treeNode.page+'"></iframe>'
+ 						}
+ 				);  
+				}
+			}
+			
+				
+			}
+		}
+
+	};
+	/* var zTreeNodes = [ {
+		id : 1,
+		pId : 0,
+		name : "父节点1"
+	}, {
+		id : 11,
+		pId : 1,
+		name : "子节点11"
+	}, {
+		id : 12,
+		pId : 1,
+		name : "子节点22"
+	}, {
+		id : 13,
+		pId : 12,
+		name : "子节点22222"
+	} ]; */
+	
+	
+	//发送ajax动态加载ztree菜单数据
+	
+
+	$(document).ready(function() {
+		var url = "../data/menu.json";//zTreeNodes:json对象
+		$.post(url,{},function(zTreeNodes){
+			//页面加载完成后为mytree容器动态创建ztree  $("#mytree"):获取到容器   setting：属性设置 zTreeNodes：节点数据
+			$.fn.zTree.init($("#mytree"), setting, zTreeNodes);
+		},'json')
+		
+
+	});
+</SCRIPT>
+</head>
+<body class="easyui-layout">
+	<div data-options="region:'north',border:false"
+		style="height: 60px; padding: 10px"></div>
+	<div data-options="region:'west',split:true,title:'菜单导航'"
+		style="width: 200px;">
+		<!-- 折叠面板  fit:true:自适应-->
+		<div class="easyui-accordion" style="width: 500px; height: 300px;" data-options="fit:true">
+			<div title="基本功能" data-options="iconCls:'icon-mini-add'"
+				style="overflow: auto; padding: 10px;">
+			 	<!-- 需求：通过添加一个按钮 动态打开选项卡 -->
+			 	<input type="button" id="mybutton" value="动态打开选项卡">
+			 	<script type="text/javascript">
+			 		//为按钮绑定单击事件 ，动态打开选项卡
+			 		$(function(){
+			 			//页面加载完成后为按钮绑定单击事件
+			 			$("#mybutton").click(function(){
+			 				//判断是否已经打开这个选项卡 
+			 				var flag = $('#mytabs').tabs('exists','快递员设置');
+			 				//alert(flag);
+			 				///如果已经打开则选中
+			 				if(flag){
+			 					$('#mytabs').tabs('select','快递员设置');
+			 				}
+			 				else
+		 					{
+			 					///如果未打开则新建选项卡
+				 				//看api如何打开选项卡
+				 				$('#mytabs').tabs('add',  //add:添加一个新的选项卡
+				 				        {
+				 				          title: '快递员设置',//选项卡标题
+				 				          selected: true, //选中
+				 				          closable:true//关闭按钮设置
+				 						}
+				 				);  
+		 					}
+			 				
+			 				
+			 			})
+			 		})
+			 	</script>
+			 	
+			 	<!-- 树形菜单标准json构造ztree -->
+			 	<!-- ztree容器 -->
+			 	<ul id="mytree" class="ztree" ></ul>
+			 	
+			</div>
+			<div title="系统管理" data-options="iconCls:'icon-mini-add'"
+				style="padding: 10px;">
+				 
+			</div>
+		</div>
+	</div>
+	<div
+		data-options="region:'east',split:true,collapsed:true,title:'East'"
+		style="width: 100px; padding: 10px;">east region</div>
+	<div data-options="region:'south',border:false"
+		style="height: 50px; padding: 10px;">BOSv2.0综合物流管理平台 | Powered
+		by 传智播客 在线人数:1</div>
+	<div id="mytabs" data-options="region:'center'" class="easyui-tabs">
+		<!-- closable:true：关闭按钮 -->
+		<div title="消息中心" style="padding:10px" data-options="closable:true">
+		</div>
+		<div title="基础档案设置" style="padding:10px" data-options="closable:true">
+		</div>
+	</div>
+</body>
+</html>

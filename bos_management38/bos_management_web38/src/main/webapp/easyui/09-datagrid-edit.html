@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>数据表格-编辑功能</title>
+<link rel="stylesheet" type="text/css"
+	href="../js/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="../js/easyui/themes/icon.css">
+<script type="text/javascript" src="../js/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="../js/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript">
+	 
+</script>
+</head>
+<body>
+
+	 
+
+	使用easyUI提供的API动态创建datagrid（推荐使用方式）
+	<!-- 定一个容器 用于存放数据表格 -->
+	<table id="dg" style="width: 605px"></table>
+	<script type="text/javascript">
+		$(function(){
+			var myIndex;//下标 为了解决是否第一次新增行
+			//如果之前为新增行，则新增一行 
+			//如果之前新增空行，未填写数据，则不新增行
+			//如果之前新增空行，填写数据，要将之前的数据保存，并新增空行
+			$('#dg').datagrid(
+								{ ///json数据格式
+				
+									url:'../data/datagrid_data.json', //请求的json数据
+									columns:[[ //columns 标题行 （包含多列）
+										{field:'id',title:'员工编号',width:100,editor:{"type":"validatebox",options:{required:true}}}, 
+										{field:'name',title:'员工姓名',width:100,editor:{"type":"validatebox",options:{required:true}}}, 
+										{field:'sal',title:'员工薪资',width:100,editor:{"type":"validatebox",options:{required:true}}} 
+									]],
+									onAfterEdit:function(rowIndex, rowData, changes){
+										//rowIndex: 编辑行索引,从0
+										//rowData: 对应的记录编辑行
+										//changes: 更改的字段/值对
+										myIndex = undefined;
+										
+									},
+									//工具栏
+									toolbar: [
+											      {  		
+												  iconCls: 'icon-add',  //按钮样式
+												  text:'增加一行',//按钮标题
+												  handler: function() //回调函数
+												  	  { 
+													  	//先保存 再添加空行
+														if(myIndex != undefined){
+													  		$('#dg').datagrid('endEdit',0);
+													  		//myIndex = undefined;
+													  	}
+													  
+													  	if(myIndex == undefined){
+													  		//新增一行
+														  	$('#dg').datagrid('insertRow',{
+															  	index: 0,	// 在第一行新增
+															  	row: {} //增加空行  启用编辑（以列为单位）
+															  });  
+														   	///启用行编辑beginEdit
+														   	$('#dg').datagrid('beginEdit',0);
+														   	myIndex = 1;
+													  	}
+													  	
+													  
+													   	
+													  }  	
+												  },
+												  {  		
+												  iconCls: 'icon-edit',  //按钮样式
+												  text:'修改',//按钮标题
+												  handler: function() //回调函数
+												  	  {
+													    alert('edit')
+													  }  	
+												  },
+												  {  		
+												  iconCls: 'icon-cancel',  //按钮样式
+												  text:'作废',//按钮标题
+												  handler: function() //回调函数
+												  	  {
+													    alert('edit')
+													  }  	
+												  },
+												  {  		
+												  iconCls: 'icon-save',  //按钮样式
+												  text:'保存',//按钮标题
+												  handler: function() //回调函数
+												  	  {
+													    //结束编辑进行保存
+														$('#dg').datagrid('endEdit',0);
+													  }  	
+												  }
+										  	  ],
+										pagination:true, // 启用分页
+										pageSize:3,//当设置分页属性,初始化页面大小 pageSize必须要在pageList值列表中
+										pageList:[1,2,3,4,5]//pageList下拉列表值设置
+								}
+							); 
+		})
+	</script>
+
+
+	
+	
+	
+</body>
+</html>
